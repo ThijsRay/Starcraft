@@ -16,30 +16,50 @@ import org.apache.commons.lang3.concurrent.TimedSemaphore;
  * @author Thijs Molendijk & Thijs Raymakers - Send a chat message to all players in the game.
  */
 public class SendText extends StarcraftAction {
-	private static List<String> CHEATS = Arrays.asList(
-			"show me the money",
-			"whats mine is mine",
-			"breathe deep",
-			"something for nothing",
-			"operation cwal",
-			"modify the phase variance",
-			"medieval man",
-			"the gathering",
-			"noglues",
-			"power overwhelming",
-			"food for thought",
-			"there is no cow level",
-			"ophelia",
-			"staying alive",
-			"man over game",
-			"game over man",
-			"war aint waht it used to be",
-			"black sheep wall",
-			"radio free zerg"
+	private static List<String> ALLOWED_PHRASES = Arrays.asList(
+			"gg",
+			"gg wp",
+			"Error: null",
+			"I'm using tilt controls!",
+			"It's free real estate!",
+			"Hello world!",
+			"bg",
+			"We are going to destroy you!",
+			"I give up",
+			"I surrender",
+			"Wololo!",
+			"Well played!",
+			"I don't feel so good Protoss",
+			"I don't feel so good Terran",
+			"I don't feel so good Zerg",
+			"no u",
+			"Nice",
+			"Yes",
+			"No",
+			"PogChamp",
+			"Ahh!",
+			"Ah! Being rushed",
+			"Ooh!",
+			"Enemy sighted!",
+			"Medic!",
+			"Is this easy mode?",
+			"VAC",
+			"nice save bro",
+			"SAVED",
+			"RUINED",
+			"Who called in the fleet?",
+			"It's your turn!",
+			"ggeznore",
+			"rekt",
+			"You must construct additional pylons",
+			"plz don't cheese me",
+			"zerg rush"
 	);
 
 	// Use a timed semaphore to limit the amount of messages sent per second.
-	private TimedSemaphore rateLimit = new TimedSemaphore(1, TimeUnit.SECONDS, 1);
+	private int TIME_UNIT = 1;
+	private int MAX_MESSAGES_PER_TIME_UNIT = 1;
+	private TimedSemaphore rateLimit = new TimedSemaphore(TIME_UNIT, TimeUnit.SECONDS, MAX_MESSAGES_PER_TIME_UNIT);
 
 	/**
 	 * The SendText constructor.
@@ -95,27 +115,19 @@ public class SendText extends StarcraftAction {
 
 	/**
 	 * Checks if the string is valid and meets the required conditions. It checks for rate limiting (max. 1 message per
-	 * second), possible cheats, possible commands and the length of the text.
+	 * second), the length of the text and if it is on the whitelist of phrases.
 	 * @param text The string that wants to be send
 	 * @return Whether it is a valid string
 	 */
 	protected boolean isValidChatString(String text) {
-		// Deny chats that are too long.
-		if (text.length() > 140) return false;
-
-		// Deny mission selects.
-		if (text.toLowerCase().startsWith("terran")
-				|| text.toLowerCase().startsWith("zerg")
-				|| text.toLowerCase().startsWith("protoss")) return false;
-
-		// Deny any slash commands.
-		if (text.toLowerCase().startsWith("/")) return false;
-
-		// Deny any cheats.
-		if (CHEATS.contains(text.toLowerCase())) return false;
+		// Deny chats that are too short or long.
+		if (text.length() < 1 || text.length() > 140) return false;
 
 		// Only allow up to 1 message a second.
 		if (!this.rateLimit.tryAcquire()) return false;
+
+		// Check if it is in the ALLOWED_PHRASES list
+		if(!ALLOWED_PHRASES.contains(text)) return false;
 
 		// If everything succeeds, return true.
 		return true;

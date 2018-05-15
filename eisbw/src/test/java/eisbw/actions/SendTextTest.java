@@ -71,19 +71,15 @@ public class SendTextTest {
     }
 
     @Test
-    public void isValidChatString_accepted() {
-        String accepted_string = "Test string!";
-        assertTrue(this.action.isValidChatString(accepted_string));
+    public void isValidChatString_too_short() {
+        String too_long = "g";
+        assertFalse(this.action.isValidChatString(too_long));
     }
 
     @Test
-    public void isValidChatString_containsRaceName() {
-        String terran = "TeRrAn";
-        assertFalse(this.action.isValidChatString(terran));
-        String zerg = "zerG";
-        assertFalse(this.action.isValidChatString(zerg));
-        String protoss = "Protoss";
-        assertFalse(this.action.isValidChatString(protoss));
+    public void isValidChatString_accepted() {
+        String accepted_string = "Yes";
+        assertTrue(this.action.isValidChatString(accepted_string));
     }
 
     @Test
@@ -100,7 +96,7 @@ public class SendTextTest {
 
     @Test
     public void isValidChatString_checkRateLimit() {
-        String message = "Test";
+        String message = "Yes";
         assertTrue(this.action.isValidChatString(message));
         this.action.execute(unit, act);
         assertFalse(this.action.isValidChatString(message));
